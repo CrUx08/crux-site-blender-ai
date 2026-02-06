@@ -1,35 +1,36 @@
+import { useEffect, useMemo, useState } from 'react'
 import './App.css'
 
 const features = [
   {
-    title: 'Context-Aware Modeling',
+    title: 'Conversational Guidance',
     description:
-      'Crux reads your scene, infers intent, and suggests topology-friendly edits with safety checks.',
+      'Type what you want (“Create a chair”), and Crux responds with clear, step-by-step Blender actions.',
   },
   {
-    title: 'Natural Language Tools',
+    title: 'Blender-Native Workflow',
     description:
-      'Say “mirror the vents, keep bevels sharp” and Crux converts it into precise Blender actions.',
+      'Crux lives inside Blender as an add-on, augmenting the UI instead of replacing your tools.',
   },
   {
-    title: 'Non-Destructive Workflow',
+    title: 'UI Highlighting',
     description:
-      'Every move is grouped, tagged, and reversible so you can explore without breaking the rig.',
+      'Crux points to the exact panels and buttons you need so you never hunt for tools.',
   },
   {
-    title: 'Asset Intelligence',
+    title: 'Clarifying Questions',
     description:
-      'Crux catalogs materials, lighting, and geometry to keep your library consistent across projects.',
+      'If your prompt is vague, Crux asks follow-ups like “round or square?” before acting.',
   },
   {
-    title: 'Studio-Ready Output',
+    title: 'Beginner-Friendly MVP',
     description:
-      'Export clean UVs, optimized meshes, and render presets with one prompt.',
+      'Focused on core primitives and guidance—no heavy automation in version 1.0.',
   },
   {
-    title: 'Local + Secure',
+    title: 'Future-Proof Roadmap',
     description:
-      'Run core features offline with optional cloud boosts for heavy renders and asset search.',
+      'Voice, automation, and AI-assisted animation are on deck for later releases.',
   },
 ]
 
@@ -55,29 +56,34 @@ const stats = [
 ]
 
 function App() {
+  const words = useMemo(() => ['Design', 'Model', 'Render'], [])
+  const [wordIndex, setWordIndex] = useState(0)
+  const [display, setDisplay] = useState('')
+  const [isDeleting, setIsDeleting] = useState(false)
+
+  useEffect(() => {
+    const current = words[wordIndex]
+    const speed = isDeleting ? 160 : 220
+    const timeout = setTimeout(() => {
+      const nextLength = isDeleting ? display.length - 1 : display.length + 1
+      setDisplay(current.slice(0, Math.max(0, nextLength)))
+
+      if (!isDeleting && nextLength === current.length + 1) {
+        setIsDeleting(true)
+      } else if (isDeleting && nextLength === 0) {
+        setIsDeleting(false)
+        setWordIndex((prev) => (prev + 1) % words.length)
+      }
+    }, display.length === 0 && !isDeleting ? 300 : speed)
+
+    return () => clearTimeout(timeout)
+  }, [display, isDeleting, wordIndex, words])
   return (
     <div className="page">
       <header className="site-header">
         <div className="brand">
           <div className="brand-mark" aria-hidden="true">
-            <svg viewBox="0 0 48 48" role="img">
-              <defs>
-                <linearGradient id="cruxGradient" x1="0" x2="1" y1="0" y2="1">
-                  <stop offset="0%" stopColor="#ff8a3d" />
-                  <stop offset="100%" stopColor="#ffcc68" />
-                </linearGradient>
-              </defs>
-              <circle cx="24" cy="24" r="22" fill="url(#cruxGradient)" />
-              <path
-                d="M16 30c6-8 10-10 16-12"
-                fill="none"
-                stroke="#101014"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <circle cx="16" cy="30" r="3" fill="#101014" />
-              <circle cx="32" cy="18" r="3" fill="#101014" />
-            </svg>
+            <img src="/crux-logo.svg" alt="" />
           </div>
           <div>
             <p className="brand-name">Crux</p>
@@ -101,11 +107,14 @@ function App() {
         <section id="home" className="hero">
           <div className="hero-content">
             <p className="eyebrow">Turn prompts into production-ready Blender scenes</p>
-            <h1>Design, model, and render at the speed of thought.</h1>
+            <h1>
+              <span className="typewriter">{display}</span> your next scene at the speed of
+              thought.
+            </h1>
             <p className="hero-description">
-              Crux is an AI assistant that lives inside Blender. It understands your scene,
-              applies best-practice workflows, and keeps you in creative flow from blockout
-              to final frame.
+              Crux is an AI assistant built as a Blender add-on. It guides you through
+              modeling with clear, step-by-step instructions—so you learn faster without
+              leaving Blender.
             </p>
             <div className="hero-actions">
               <a className="primary-button" href="#download">
@@ -140,33 +149,33 @@ function App() {
                     <div className="viewport-glow" />
                     <div className="viewport-caption">Viewport: Crux draft scene</div>
                   </div>
-                  <div className="ui-side">
-                    <div className="panel">
-                      <p className="panel-title">Crux Assistant</p>
-                      <div className="panel-item active">
-                        <span className="badge">Idea</span>
-                        <p>“Retro sci-fi hallway, neon trims.”</p>
-                      </div>
-                      <div className="panel-item">
-                        <span className="badge">Action</span>
-                        <p>Generated modular walls + bevels</p>
-                      </div>
-                      <div className="panel-item">
-                        <span className="badge">Output</span>
-                        <p>Assigned emissive neon materials</p>
-                      </div>
-                    </div>
-                    <div className="panel code">
-                      <p className="panel-title">Generated Ops</p>
-                      <code>
-                        crux.create_modular_wall(segments=6)
-                        <br />
-                        crux.apply_bevel(limit=0.35)
-                        <br />
-                        crux.assign_material(&quot;Neon-Pulse&quot;)
-                      </code>
-                    </div>
-                  </div>
+            <div className="ui-side">
+              <div className="panel">
+                <p className="panel-title">Crux Assistant</p>
+                <div className="panel-item active">
+                  <span className="badge">Idea</span>
+                  <p>“Create a simple chair.”</p>
+                </div>
+                <div className="panel-item">
+                  <span className="badge">Action</span>
+                  <p>Add Mesh → Cube, scale 1.5×</p>
+                </div>
+                <div className="panel-item">
+                  <span className="badge">Output</span>
+                  <p>Ask: “Round or square legs?”</p>
+                </div>
+              </div>
+              <div className="panel code">
+                <p className="panel-title">Generated Ops</p>
+                <code>
+                  crux.add_mesh('Cube')
+                  <br />
+                  crux.scale(1.5, 0.6, 1.5)
+                  <br />
+                  crux.ask_clarify('Leg style?')
+                </code>
+              </div>
+            </div>
                 </div>
               </div>
               <div className="hero-card">
@@ -184,10 +193,10 @@ function App() {
         <section id="features" className="section">
           <div className="section-heading">
             <p className="eyebrow">Features</p>
-            <h2>Everything you need to ship scenes faster.</h2>
+            <h2>Guidance-first, Blender-native AI.</h2>
             <p className="section-description">
-              Crux focuses on the busy work so you can iterate on lighting, composition, and
-              storytelling.
+              Crux 1.0 focuses on clarity and learning: it helps you understand Blender while
+              speeding up the basics.
             </p>
           </div>
           <div className="feature-grid">
@@ -205,8 +214,8 @@ function App() {
             <p className="eyebrow">Download</p>
             <h2>Install in minutes, no guesswork.</h2>
             <p className="section-description">
-              We ship weekly builds, but stability matters. Grab the latest signed version for
-              Blender 3.6+.
+              Crux 1.0 is a Blender add-on built with Python. Install it and start creating
+              right away.
             </p>
           </div>
           <div className="download-grid">
@@ -236,26 +245,25 @@ function App() {
         <section id="about" className="section about">
           <div className="section-heading">
             <p className="eyebrow">About Crux</p>
-            <h2>Built by artists who wanted a calmer pipeline.</h2>
+            <h2>Built to guide, not replace.</h2>
             <p className="section-description">
-              We are a small team of Blender users, technical artists, and ML engineers. Our
-              mission is to turn the hardest parts of 3D into guided, repeatable steps so every
-              artist can ship cinematic work.
+              Crux is designed to sit beside you in Blender, highlighting tools and guiding
+              your next move. The goal is confidence and momentum, not automation overload.
             </p>
           </div>
           <div className="about-grid">
             <div className="about-card">
-              <h3>Our promise</h3>
+              <h3>1.0 Scope</h3>
               <p>
-                Crux never overrides your creative decisions. It suggests, previews, and lets
-                you accept or tweak every change.
+                Focused on primitives and clear instructions. No complex lighting, materials,
+                or animation yet.
               </p>
             </div>
             <div className="about-card">
               <h3>What&apos;s next</h3>
               <p>
-                Live collaboration, scene diagnostics, and smarter render budgeting are already
-                in private beta.
+                Voice input, automation for modeling and lighting, and AI-assisted animation
+                are on the roadmap.
               </p>
             </div>
           </div>
@@ -265,7 +273,7 @@ function App() {
       <footer className="site-footer">
         <div>
           <p className="brand-name">Crux</p>
-          <p className="footer-text">Blender AI Assistant for ambitious teams.</p>
+          <p className="footer-text">Blender AI Assistant for ambitious story teller.</p>
         </div>
         <div className="footer-links">
           <a href="#features">Features</a>

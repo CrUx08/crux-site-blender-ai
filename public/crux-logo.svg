@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-label="Crux logo">
+  <defs>
+    <linearGradient id="cruxGradient" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ff8a3d" />
+      <stop offset="100%" stop-color="#ffcc68" />
+    </linearGradient>
+  </defs>
+  <circle cx="24" cy="24" r="22" fill="url(#cruxGradient)" />
+  <path
+    d="M16 30c6-8 10-10 16-12"
+    fill="none"
+    stroke="#101014"
+    stroke-width="3"
+    stroke-linecap="round"
+  />
+  <circle cx="16" cy="30" r="3" fill="#101014" />
+  <circle cx="32" cy="18" r="3" fill="#101014" />
+</svg>
